@@ -13,10 +13,9 @@ import modelo.Colores;
 import modelo.Lista;
 import modelo.Pila;
 
-public class Barajar implements ActionListener, Barajable {
+public class Barajar implements Barajable {
 
-	ParaUi paraui;
-	ArrayList listaDummy=paraui.getJuego().getDatos().getListaAuxiliar().getListaColores();
+	private ParaUi paraui;
 
 	public Barajar(ParaUi paraui) {
 		super();
@@ -24,41 +23,32 @@ public class Barajar implements ActionListener, Barajable {
 	}
 
 	@Override
-	public void barajar() {
+	public <T> void barajar(ArrayList<T> listaDummy) {
 		Collections.shuffle((List<?>) listaDummy);
 	}
 
 	@Override
-	public void volcarPilasEnLista() {
-		for (Color color : paraui.getJuego().getDatos().getPilaUno().getPilaColores()) {
+	public <T> void volcarPilasEnLista(ArrayList<T> listaDummy, Stack<T> pilaOne, Stack<T> pilaTwo) {
+		for (T color : pilaOne) {
 			listaDummy.add(color);
 		}
-		for (Color color : paraui.getJuego().getDatos().getPilaDos().getPilaColores()) {
+		for (T color : pilaTwo) {
 			listaDummy.add(color);
 		}
-		paraui.getJuego().getDatos().getPilaUno().vaciarPila(paraui.getJuego().getDatos().getPilaUno());
-		paraui.getJuego().getDatos().getPilaDos().vaciarPila(paraui.getJuego().getDatos().getPilaDos());
-
-	}
-
-	public void volcarListaEnPilas() {
-		int i=0;
-		for (int j = 0; j < listaDummy.size(); j++) {
-			if (i%2==0) {
-				paraui.getJuego().getDatos().getPilaUno().introducir((Color) listaDummy.get(i));
-			}else {
-				paraui.getJuego().getDatos().getPilaDos().introducir((Color) listaDummy.get(i));
-			}
-			i++;
-		}
+		pilaOne.removeAllElements();
+		pilaTwo.removeAllElements();
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		volcarPilasEnLista();
-		barajar();
-		volcarListaEnPilas();
-
+	public <T> void volcarListaEnPilas(ArrayList<T> listaDummy, Stack<T> pilaOne, Stack<T> pilaTwo) {
+		for (int i = 0; i < listaDummy.size(); i++) {
+			if (i % 2 == 0) {
+				pilaOne.add(listaDummy.get(i));
+			} else {
+				pilaTwo.add(listaDummy.get(i));
+			}
+		}
+		listaDummy.clear();
+		paraui.getJuego().disminuirIntentos(paraui.getJuego().getIntentosBarajar());
 	}
-
 }
